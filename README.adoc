@@ -39,7 +39,7 @@ Things to cover during the tutorial:
 Copy a git repo without history
 https://stackoverflow.com/questions/29368837/copy-a-git-repo-without-history
 
-cd local/wabt
-wget https://github.com/wasm3/wasm3/releases/download/v0.5.0/wasm3-linux-x64.elf
+    cd local/wabt
+    wget https://github.com/wasm3/wasm3/releases/download/v0.5.0/wasm3-linux-x64.elf
 
 IMPORTANT: Don't forget to update PATH in start.sh

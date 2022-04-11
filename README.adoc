@@ -7,3 +7,37 @@ Things to cover during the tutorial:
 - Pyodide
 - General wasm overview
 - Wasmer Python
+
+    mkdir local
+    mkdir local/python
+
+    sudo apt update
+    sudo apt upgrade
+    sudo apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev wget libbz2-dev
+    mkdir tmp
+    cd tmp
+    wget https://www.python.org/ftp/python/3.10.4/Python-3.10.4.tgz
+    tar xzf Python-3.10.4.tgz
+    cd Python-3.10.4
+    ./configure --prefix=/workspace/pycon2022-experiments/local/python --enable-optimizations
+    make
+    make install
+
+    source start.sh
+
+    pip install wasmer wasmer_compiler_cranelift
+
+    cd tmp
+    git clone --recursive https://github.com/WebAssembly/wabt
+    cd wabt
+    git submodule update --init
+    mkdir build
+    cd build
+    cmake ..
+    cmake --build .
+
+Copy a git repo without history
+https://stackoverflow.com/questions/29368837/copy-a-git-repo-without-history
+
+cd local/wabt
+wget https://github.com/wasm3/wasm3/releases/download/v0.5.0/wasm3-linux-x64.elf

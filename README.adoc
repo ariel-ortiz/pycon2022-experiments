@@ -1,3 +1,9 @@
 # PyCon2022 Experiments
 
 Repo for the PyCon 2022 tutorial.
+
+Things to cover during the tutorial:
+
+- Pyodide
+- General wasm overview
+- Wasmer Python

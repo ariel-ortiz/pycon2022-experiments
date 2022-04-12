@@ -1,0 +1,5 @@
+tasks:
+    - init: echo 'init script'
+      env:
+        VARIABLE_TWO: 2
+      command: echo $VARIABLE_TWO

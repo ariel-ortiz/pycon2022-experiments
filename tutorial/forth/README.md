@@ -28,10 +28,3 @@ in forth:
 + Loop _N_ _M_ `loop` body `pool`
 
     1 10 loop . cr pool
-
-
-
-
-Duplicate
-
-## Drop

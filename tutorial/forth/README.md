@@ -1,4 +1,4 @@
-# chiqui_forth
+# ChiquiForth
 
 ## Easy Forth Tutorial
 

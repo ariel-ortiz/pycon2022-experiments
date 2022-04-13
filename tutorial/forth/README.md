@@ -1,4 +1,4 @@
-# ChiquiForth
+# TeenyWeenyForth Compiler
 
 ## Easy Forth Tutorial
 
@@ -22,9 +22,10 @@ in forth:
 + Emit `emit` used to output numbers as ascii characters
 + Print `.`
 + Carriage return `cr`
-+ Space `sp`
 + Comparisons `== != < <= > >=`
-+ Conditional `if` body `fi`
-+ Loop _N_ _M_ `loop` body `pool`
++ Logic operators: `and or not`
++ `variable`  get value of variable
++ `!variable` set value of variable
++ Loop (works like a `while` statement):
 
-    1 10 loop . cr pool
+      [ condition ? body ]

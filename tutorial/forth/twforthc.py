@@ -8,8 +8,8 @@ head = ''';; TeenyWeenyForth compiler WAT output
   (import "twforth" "emit" (func $emit (param i32)))
   (func $main
     (export "main")
-    (local $tmp1 i32)
-    (local $tmp2 i32)'''
+    (local $_tmp1 i32)
+    (local $_tmp2 i32)'''
 
 tail = '''  )
 )'''
@@ -21,29 +21,31 @@ operation = {
     '/': ['i32.div_s'],
     '.': ['call $print'],
     'dup': [
-        'local.set $tmp1',
-        'local.get $tmp1',
-        'local.get $tmp1'
+        'local.set $_tmp1',
+        'local.get $_tmp1',
+        'local.get $_tmp1'
     ],
     'drop': ['drop'],
     'swap': [
-        'local.set $tmp1',
-        'local.set $tmp2',
-        'local.get $tmp1',
-        'local.get $tmp2'
+        'local.set $_tmp1',
+        'local.set $_tmp2',
+        'local.get $_tmp1',
+        'local.get $_tmp2'
     ],
     'emit': ['call $emit'],
     'cr': [
         'i32.const 10',
         'call $emit'
     ],
-    'loop': [
+    '[': [
         'block $break',
         'loop $top',
+    ],
+    '?': [
         'i32.eqz',
         'br_if $break'
     ],
-    'end': [
+    ']': [
         'br $top',
         'end ;; loop',
         'end ;; block'
@@ -63,7 +65,23 @@ with open(argv[1]) as source_file:
 
 tokens = source_text.split()
 
+# check for variable usage
+varnames = set()
+
+def is_variable_name(s):
+    return (s[0].isalpha()
+        and s.isalnum()
+        and s not in operation_names)
+
+for token in tokens:
+    s = token[1:] if token[0] == '!' else token
+    if is_variable_name(s):
+        varnames.add(s)
+
 result.append(head)
+
+for varname in varnames:
+    result.append(indent + f'(local ${varname} i32)')
 
 for token in tokens:
     if token.isdigit():
@@ -71,6 +89,10 @@ for token in tokens:
     elif token in operation_names:
         for statement in operation[token]:
             result.append(indent + statement)
+    elif is_variable_name(token):
+        result.append(indent + f'local.get ${token}')
+    elif token[0] == '!' and is_variable_name(token[1:]):
+        result.append(indent + f'local.set ${token[1:]}')
     else:
         raise ValueError(f"'{token}' is not a valid word")
 

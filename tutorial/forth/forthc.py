@@ -70,7 +70,7 @@ operation_names = list(operation.keys())
 indent = '    '
 
 if len(argv) != 2:
-    print('Please provide the name of the TeenyWeenyForth source file.')
+    print('Please provide the name of the ChiquiForth source file.')
     exit(1)
 
 with open(argv[1]) as source_file:

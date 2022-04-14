@@ -1,4 +1,4 @@
-# TeenyWeenyForth Compiler
+# ChiquiForth Compiler
 
 ## Easy Forth Tutorial
 

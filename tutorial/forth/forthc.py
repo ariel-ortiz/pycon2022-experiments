@@ -74,7 +74,7 @@ def is_variable_name(s):
         and s not in operation_names)
 
 for token in tokens:
-    s = token[1:] if token[0] == '!' else token
+    s = token[:-1] if token[-1] == '!' else token
     if is_variable_name(s):
         varnames.add(s)
 
@@ -91,8 +91,8 @@ for token in tokens:
             result.append(indent + statement)
     elif is_variable_name(token):
         result.append(indent + f'local.get ${token}')
-    elif token[0] == '!' and is_variable_name(token[1:]):
-        result.append(indent + f'local.set ${token[1:]}')
+    elif token[-1] == '!' and is_variable_name(token[:-1]):
+        result.append(indent + f'local.set ${token[:-1]}')
     else:
         raise ValueError(f"'{token}' is not a valid word")
 

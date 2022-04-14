@@ -20,6 +20,15 @@ operation = {
     '*': ['i32.mul'],
     '/': ['i32.div_s'],
     '.': ['call $print'],
+    '=': ['i32.eq'],
+    '<>': ['i32.ne'],
+    '<': ['i32.lt_s'],
+    '<=': ['i32.le_s'],
+    '>': ['i32.gt_s'],
+    '>=': ['i32.ge_s'],
+    'and': ['i32.and'],
+    'or': ['i32.or'],
+    'not': ['i32.eqz'],
     'dup': [
         'local.set $_tmp1',
         'local.get $_tmp1',
@@ -37,7 +46,11 @@ operation = {
         'i32.const 10',
         'call $emit'
     ],
-    '[': [
+    'bl': [
+        'i32.const 32',
+        'call $emit'
+    ],
+    'do': [
         'block',
         'loop',
     ],
@@ -45,7 +58,7 @@ operation = {
         'i32.eqz',
         'br_if 1'
     ],
-    ']': [
+    'loop': [
         'br 0',
         'end ;; loop',
         'end ;; block'
@@ -83,8 +96,14 @@ result.append(head)
 for varname in varnames:
     result.append(indent + f'(local ${varname} i32)')
 
+inside_comment = False
 for token in tokens:
-    if token.isdigit():
+    if inside_comment:
+        if token == ')':
+            inside_comment = False
+    elif token == '(':
+        inside_comment = True
+    elif token.isdigit():
         result.append(indent + f'i32.const {token}')
     elif token in operation_names:
         for statement in operation[token]:

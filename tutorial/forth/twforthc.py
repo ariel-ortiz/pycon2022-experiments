@@ -38,15 +38,15 @@ operation = {
         'call $emit'
     ],
     '[': [
-        'block $break',
-        'loop $top',
+        'block',
+        'loop',
     ],
     '?': [
         'i32.eqz',
-        'br_if $break'
+        'br_if 1'
     ],
     ']': [
-        'br $top',
+        'br 0',
         'end ;; loop',
         'end ;; block'
     ]

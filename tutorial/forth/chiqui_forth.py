@@ -68,7 +68,7 @@ OPERATION = {
     ]
 }
 
-indent = '    '
+INDENTATION = '    '
 
 def check_args():
     if len(argv) != 2:
@@ -117,20 +117,20 @@ def find_vars_used(tokens):
 
 def declare_vars(result, vars):
     for var in vars:
-        result.append(indent + f'(local ${var} i32)')
+        result.append(INDENTATION + f'(local ${var} i32)')
 
 
 def code_generation(result, tokens):
     for token in tokens:
         if token.isdigit():
-            result.append(indent + f'i32.const {token}')
+            result.append(INDENTATION + f'i32.const {token}')
         elif token in OPERATION:
             for statement in OPERATION[token]:
-                result.append(indent + statement)
+                result.append(INDENTATION + statement)
         elif is_var_name(token):
-            result.append(indent + f'local.get ${token}')
+            result.append(INDENTATION + f'local.get ${token}')
         elif token[-1] == '!' and is_var_name(token[:-1]):
-            result.append(indent + f'local.set ${token[:-1]}')
+            result.append(INDENTATION + f'local.set ${token[:-1]}')
         else:
             raise ValueError(f"'{token}' is not a valid word")
 

@@ -1,17 +1,16 @@
 #!/usr/bin/env python
 
-# Generic Wat execution script.
-# Copyright (C) 2021 Ariel Ortiz, ITESM CEM
+# Generic WASM execution script.
+# Copyright (C) 2022 Ariel Ortiz
 #
 # To run, at the terminal type:
 #
-#     python execute.py input_file.wat
+#     python execute.py input_file.wasm
 
 from sys import argv, stdin, stderr, exit
-from wasmer import engine, Module, wat2wasm, Store, Instance
+from wasmer import engine, Module, Store, Instance, ImportObject, Function
 from wasmer_compiler_cranelift import Compiler
 
-from wasmer import ImportObject, Function
 
 def make_import_object(store):
 
@@ -29,7 +28,7 @@ def make_import_object(store):
     import_object = ImportObject()
 
     import_object.register(
-        "twforth",
+        "forth",
         {
             "print": Function(store, _print),
             "emit": Function(store, _emit)
@@ -40,35 +39,21 @@ def make_import_object(store):
 
 
 def create_instance(file_name):
-    with open(file_name) as wat_file:
-        return Instance(Module(Store(engine.JIT(Compiler)),
-                               wat2wasm(wat_file.read())))
+    store = Store(engine.JIT(Compiler))
+    with open(file_name, 'rb') as file:
+        return Instance(Module(store, file.read()),
+                        make_import_object(store))
 
-def main():
 
+def check_args():
     if len(argv) != 2:
-        print('Please specify the name of the input WAT file.', file=stderr)
+        print('Please specify the name of the WASM binary file.', file=stderr)
         exit(1)
 
-     # Create a store
-    store = Store(engine.JIT(Compiler))
 
-    # Convert Wat file contents into Wasm binary code
-    wat_file_name = argv[1]
-    with open(wat_file_name) as wat_file:
-        wat_source_code = wat_file.read()
-    wasm_bytes = wat2wasm(wat_source_code)
-
-    # Compile the Wasm module
-    module = Module(store, wasm_bytes)
-
-    # Obtain functions to be imported from the Wasm module
-    import_object = make_import_object(store)
-
-    # Instantiate the module
-    instance = Instance(module, import_object)
-
-    # Run start function
+def main():
+    check_args()
+    instance = create_instance(argv[1])
     instance.exports.main()
 
 main()

@@ -1,20 +1,23 @@
+#!/usr/bin/env python
+
+from os.path import splitext
 from sys import argv, stderr, exit
+from wasmer import wat2wasm
 
-result = []
+START_SECTION = ''';; chiqui_forth compiler WAT output
 
-head = ''';; TeenyWeenyForth compiler WAT output
 (module
-  (import "twforth" "print" (func $print (param i32)))
-  (import "twforth" "emit" (func $emit (param i32)))
+  (import "forth" "print" (func $print (param i32)))
+  (import "forth" "emit" (func $emit (param i32)))
   (func $main
     (export "main")
     (local $_tmp1 i32)
     (local $_tmp2 i32)'''
 
-tail = '''  )
+END_SECTION = '''  )
 )'''
 
-operation = {
+OPERATION = {
     '+': ['i32.add'],
     '-': ['i32.sub'],
     '*': ['i32.mul'],
@@ -65,56 +68,97 @@ operation = {
     ]
 }
 
-operation_names = list(operation.keys())
-
 indent = '    '
 
-if len(argv) != 2:
-    print('Please provide the name of the ChiquiForth source file.')
-    exit(1)
+def check_args():
+    if len(argv) != 2:
+        print('Please specify the name of the Forth source file.', file=stderr)
+        exit(1)
 
-with open(argv[1]) as source_file:
-    source_text = source_file.read()
 
-tokens = source_text.split()
+def read_tokens(input_file_name):
+    try:
+        with open(argv[1]) as source_file:
+            source_text = source_file.read()
+        return source_text.split()
+    except FileNotFoundError:
+        print(f'Oops! File not found: {input_file_name}', file=stderr)
+        exit(1)
 
-# check for variable usage
-varnames = set()
 
-def is_variable_name(s):
-    return (s[0].isalpha()
-        and s.isalnum()
-        and s not in operation_names)
+def remove_comments(tokens):
+    commentless_tokens = []
+    inside_comment = False
+    for token in tokens:
+        if inside_comment:
+            if token == ')':
+                inside_comment = False
+        elif token == '(':
+            inside_comment = True
+        else:
+            commentless_tokens.append(token)
+    return commentless_tokens
 
-for token in tokens:
-    s = token[:-1] if token[-1] == '!' else token
-    if is_variable_name(s):
-        varnames.add(s)
 
-result.append(head)
+def is_var_name(token):
+    return (token[0].isalpha()
+        and token.isalnum()
+        and token not in OPERATION)
 
-for varname in varnames:
-    result.append(indent + f'(local ${varname} i32)')
 
-inside_comment = False
-for token in tokens:
-    if inside_comment:
-        if token == ')':
-            inside_comment = False
-    elif token == '(':
-        inside_comment = True
-    elif token.isdigit():
-        result.append(indent + f'i32.const {token}')
-    elif token in operation_names:
-        for statement in operation[token]:
-            result.append(indent + statement)
-    elif is_variable_name(token):
-        result.append(indent + f'local.get ${token}')
-    elif token[-1] == '!' and is_variable_name(token[:-1]):
-        result.append(indent + f'local.set ${token[:-1]}')
-    else:
-        raise ValueError(f"'{token}' is not a valid word")
+def find_vars_used(tokens):
+    names = set()
+    for token in tokens:
+        name = token[:-1] if token[-1] == '!' else token
+        if is_var_name(name):
+            names.add(name)
+    return names
 
-result.append(tail)
 
-print('\n'.join(result))
+def declare_vars(result, vars):
+    for var in vars:
+        result.append(indent + f'(local ${var} i32)')
+
+
+def code_generation(result, tokens):
+    for token in tokens:
+        if token.isdigit():
+            result.append(indent + f'i32.const {token}')
+        elif token in OPERATION:
+            for statement in OPERATION[token]:
+                result.append(indent + statement)
+        elif is_var_name(token):
+            result.append(indent + f'local.get ${token}')
+        elif token[-1] == '!' and is_var_name(token[:-1]):
+            result.append(indent + f'local.set ${token[:-1]}')
+        else:
+            raise ValueError(f"'{token}' is not a valid word")
+
+def create_wat_file(file_name, file_content):
+    with open(file_name + '.wat', 'w') as file:
+        file.write(file_content)
+
+
+def create_wasm_file(file_name, file_content):
+    with open(file_name + '.wasm', 'wb') as file:
+        file.write(wat2wasm(file_content))
+
+
+def main():
+    check_args()
+    full_source_name = argv[1]
+    tokens = read_tokens(full_source_name)
+    tokens = remove_comments(tokens)
+    result = []
+    result.append(START_SECTION)
+    declare_vars(result, find_vars_used(tokens))
+    code_generation(result, tokens)
+    result.append(END_SECTION)
+    file_name, extension = splitext(full_source_name)
+    file_content = '\n'.join(result)
+    create_wat_file(file_name, file_content)
+    create_wasm_file(file_name, file_content)
+
+
+if __name__ == '__main__':
+    main()

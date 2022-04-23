@@ -17,11 +17,15 @@ def make_import_object(store):
     #----------------------------------------------------------------
     # Functions to be imported from the Wasm module
 
-    def _print(x: int):
-        print(f'{x} ', end='')
+    def _input() -> int:
+        x = input()
+        return int(x) if x.isdigit() else 0
 
     def _emit(x: int):
         print(chr(x), end='')
+
+    def _print(x: int):
+        print(f'{x} ', end='')
 
     #----------------------------------------------------------------
 
@@ -30,8 +34,9 @@ def make_import_object(store):
     import_object.register(
         "forth",
         {
-            "print": Function(store, _print),
-            "emit": Function(store, _emit)
+            "emit": Function(store, _emit),
+            "input": Function(store, _input),
+            "print": Function(store, _print)
         }
     )
 
@@ -54,6 +59,6 @@ def check_args():
 def main():
     check_args()
     instance = create_instance(argv[1])
-    instance.exports.main()
+    instance.exports._start()
 
 main()

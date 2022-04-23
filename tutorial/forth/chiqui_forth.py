@@ -7,12 +7,10 @@ from wasmer import wat2wasm
 WAT_SOURCE_BEGIN = ''';; chiqui_forth compiler WAT output
 
 (module
-  (import "forth" "print" (func $print (param i32)))
   (import "forth" "emit" (func $emit (param i32)))
-  (func $main
-    (export "main")
-    (local $_tmp1 i32)
-    (local $_tmp2 i32)'''
+  (import "forth" "input" (func $input (result i32)))
+  (import "forth" "print" (func $print (param i32)))
+  (func (export "_start")'''
 
 WAT_SOURCE_END = '''  )
 )'''
@@ -23,6 +21,7 @@ OPERATION = {
     '*': ['i32.mul'],
     '/': ['i32.div_s'],
     '.': ['call $print'],
+    'input': ['call $input'],
     '=': ['i32.eq'],
     '<>': ['i32.ne'],
     '<': ['i32.lt_s'],
@@ -32,18 +31,7 @@ OPERATION = {
     'and': ['i32.and'],
     'or': ['i32.or'],
     'not': ['i32.eqz'],
-    'dup': [
-        'local.set $_tmp1',
-        'local.get $_tmp1',
-        'local.get $_tmp1'
-    ],
     'drop': ['drop'],
-    'swap': [
-        'local.set $_tmp1',
-        'local.set $_tmp2',
-        'local.get $_tmp1',
-        'local.get $_tmp2'
-    ],
     'emit': ['call $emit'],
     'cr': [
         'i32.const 10',

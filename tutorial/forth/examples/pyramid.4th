@@ -1,6 +1,7 @@
 ( Program: Draw a pyramid of stars with base size n )
 
-10 n!
+62 emit bl
+input n!
 1 i!
 do
     n ?

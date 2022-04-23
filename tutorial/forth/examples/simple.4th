@@ -1,11 +1,7 @@
-(
-    Program: Simple Example
-)
+( Program: Simple Example )
 
-20 14 -
-4 3 +
-*
-dup
-.
-cr
-.
+62 emit bl
+input x!
+62 emit bl
+input y!
+x y + .

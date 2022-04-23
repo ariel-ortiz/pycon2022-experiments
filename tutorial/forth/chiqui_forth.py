@@ -4,7 +4,7 @@ from os.path import splitext
 from sys import argv, stderr, exit
 from wasmer import wat2wasm
 
-START_SECTION = ''';; chiqui_forth compiler WAT output
+WAT_SOURCE_BEGIN = ''';; chiqui_forth compiler WAT output
 
 (module
   (import "forth" "print" (func $print (param i32)))
@@ -14,7 +14,7 @@ START_SECTION = ''';; chiqui_forth compiler WAT output
     (local $_tmp1 i32)
     (local $_tmp2 i32)'''
 
-END_SECTION = '''  )
+WAT_SOURCE_END = '''  )
 )'''
 
 OPERATION = {
@@ -150,10 +150,10 @@ def main():
     tokens = read_tokens(full_source_name)
     tokens = remove_comments(tokens)
     result = []
-    result.append(START_SECTION)
+    result.append(WAT_SOURCE_BEGIN)
     declare_vars(result, find_vars_used(tokens))
     code_generation(result, tokens)
-    result.append(END_SECTION)
+    result.append(WAT_SOURCE_END)
     file_name, extension = splitext(full_source_name)
     file_content = '\n'.join(result)
     create_wat_file(file_name, file_content)

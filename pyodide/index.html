@@ -20,17 +20,19 @@
             `);
         let now = pyodide.runPython(`
             from datetime import datetime
-            datetime.now().isoformat()
+            now = datetime.now()
+            result = now.isoformat()
+            result
             `);
         let quote = pyodide.runPython(`
             import random
             oneliners = [
-                ('A data scientist is a person who is better at statistics than '
-                 'any programmer and better at programming than any '
-                 'statistician.'),
+                'A data scientist is a person who is better at '
+                    'statistics than any programmer and better at '
+                    'programming than any statistician.',
                 "!false (It's funny because it's true.)",
-                ('Why do programmers always mix up Christmas and Halloween? '
-                 'Because Dec 25 is Oct 31.'),
+                'Why do programmers always mix up Christmas and '
+                    'Halloween? Because Dec 25 is Oct 31.',
                 'Have you tried turning it off and on again?'
             ]
             random.choice(oneliners)

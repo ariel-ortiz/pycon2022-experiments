@@ -85,7 +85,7 @@ def remove_comments(words):
             inside_comment = True
         else:
             commentless_words.append(word)
-    return commentless_words
+    words[:] = commentless_words
 
 
 def is_var_name(word):
@@ -136,7 +136,7 @@ def main():
     check_args()
     full_source_name = argv[1]
     words = read_words(full_source_name)
-    words = remove_comments(words)
+    remove_comments(words)
     result = []
     result.append(WAT_SOURCE_BEGIN)
     declare_vars(result, find_vars_used(words))

@@ -76,7 +76,7 @@ def check_args():
         exit(1)
 
 
-def read_tokens(input_file_name):
+def read_words(input_file_name):
     try:
         with open(argv[1]) as source_file:
             source_text = source_file.read()
@@ -86,30 +86,30 @@ def read_tokens(input_file_name):
         exit(1)
 
 
-def remove_comments(tokens):
-    commentless_tokens = []
+def remove_comments(words):
+    commentless_words = []
     inside_comment = False
-    for token in tokens:
+    for word in words:
         if inside_comment:
-            if token == ')':
+            if word == ')':
                 inside_comment = False
-        elif token == '(':
+        elif word == '(':
             inside_comment = True
         else:
-            commentless_tokens.append(token)
-    return commentless_tokens
+            commentless_words.append(word)
+    return commentless_words
 
 
-def is_var_name(token):
-    return (token[0].isalpha()
-        and token.isalnum()
-        and token not in OPERATION)
+def is_var_name(word):
+    return (word[0].isalpha()
+        and word.isalnum()
+        and word not in OPERATION)
 
 
-def find_vars_used(tokens):
+def find_vars_used(words):
     names = set()
-    for token in tokens:
-        name = token[:-1] if token[-1] == '!' else token
+    for word in words:
+        name = word[:-1] if word[-1] == '!' else word
         if is_var_name(name):
             names.add(name)
     return names
@@ -120,19 +120,19 @@ def declare_vars(result, vars):
         result.append(INDENTATION + f'(local ${var} i32)')
 
 
-def code_generation(result, tokens):
-    for token in tokens:
-        if token.isdigit():
-            result.append(INDENTATION + f'i32.const {token}')
-        elif token in OPERATION:
-            for statement in OPERATION[token]:
+def code_generation(result, words):
+    for word in words:
+        if word.isdigit():
+            result.append(INDENTATION + f'i32.const {word}')
+        elif word in OPERATION:
+            for statement in OPERATION[word]:
                 result.append(INDENTATION + statement)
-        elif is_var_name(token):
-            result.append(INDENTATION + f'local.get ${token}')
-        elif token[-1] == '!' and is_var_name(token[:-1]):
-            result.append(INDENTATION + f'local.set ${token[:-1]}')
+        elif is_var_name(word):
+            result.append(INDENTATION + f'local.get ${word}')
+        elif word[-1] == '!' and is_var_name(word[:-1]):
+            result.append(INDENTATION + f'local.set ${word[:-1]}')
         else:
-            raise ValueError(f"'{token}' is not a valid word")
+            raise ValueError(f"'{word}' is not a valid word")
 
 def create_wat_file(file_name, file_content):
     with open(file_name + '.wat', 'w') as file:
@@ -147,12 +147,12 @@ def create_wasm_file(file_name, file_content):
 def main():
     check_args()
     full_source_name = argv[1]
-    tokens = read_tokens(full_source_name)
-    tokens = remove_comments(tokens)
+    words = read_words(full_source_name)
+    words = remove_comments(words)
     result = []
     result.append(WAT_SOURCE_BEGIN)
-    declare_vars(result, find_vars_used(tokens))
-    code_generation(result, tokens)
+    declare_vars(result, find_vars_used(words))
+    code_generation(result, words)
     result.append(WAT_SOURCE_END)
     file_name, extension = splitext(full_source_name)
     file_content = '\n'.join(result)

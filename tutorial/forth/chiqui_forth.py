@@ -33,11 +33,11 @@ OPERATION = {
     'not': ['i32.eqz'],
     'drop': ['drop'],
     'emit': ['call $emit'],
-    'cr': [
+    'nl': [
         'i32.const 10',
         'call $emit'
     ],
-    'bl': [
+    'sp': [
         'i32.const 32',
         'call $emit'
     ],
@@ -142,8 +142,8 @@ def main():
     declare_vars(result, find_vars_used(words))
     code_generation(result, words)
     result.append(WAT_SOURCE_END)
-    file_name, extension = splitext(full_source_name)
     file_content = '\n'.join(result)
+    file_name, _ = splitext(full_source_name)
     create_wat_file(file_name, file_content)
     create_wasm_file(file_name, file_content)
 

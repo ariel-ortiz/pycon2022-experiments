@@ -1,6 +1,7 @@
-( Program: Draw a pyramid of stars with base size n )
+( File: triangle.4th )
+( Draws a triangle of stars of a size provided by the user. )
 
-62 emit bl ( print prompt )
+62 emit 32 emit ( Print prompt. )
 input n!
 1 i! do
     i n <= ?
@@ -9,6 +10,6 @@ input n!
         42 emit
         j 1 - j!
     loop
-    cr
+    nl
     i 1 + i!
 loop
